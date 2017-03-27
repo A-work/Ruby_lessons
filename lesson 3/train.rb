@@ -14,26 +14,14 @@ class Train
     @current_station_id = 0
   end
  
+  def gain_speed
+    @speed += 10
+  end
+
   def stop
     @speed = 0
   end
- 
-  private def stopped?
-    @speed == 0
-  end
- 
-  def speedup(speed)
-    @speed += speed
-  end
- 
-  def slowdown(speed)
-    if @speed - speed >= 0
-      @speed -= speed
-    else
-      @speed = 0
-    end
-  end
- 
+
   def carriage_add
     @carriage_amount += 1 if stopped?
   end
@@ -42,23 +30,54 @@ class Train
     @carriage_amount -= 1 if stopped? && @carriage_amount > 0
   end
  
-  def show_current_station
-    puts "Текущая станция #{@route.stations[@current_station_id].name}"
-  end
- 
-  def show_next_station
-    puts "Следующая станция #{@route.stations[@current_station_id + 1].name}"
-  end
- 
-  def show_previous_station
-    if @current_station_id != 0
-      puts "Предидущая станция #{@route.stations[@current_station_id - 1].name}"
-    else
-      puts "Поезд на начальной станции"
+  def forward
+    unless current_route == last_route
+      leave
+      @current_station_id += 1
+      go_to_station
     end
   end
- 
-  def goto_station(station)
-    @current_station_id = @route.stations.index(station)
+
+  def backward
+    unless current_route == first_route
+      leave
+      @current_station_id -= 1
+      go_to_station
+    end
   end
+
+  def current_route
+    @route[@current_station_id]
+  end
+
+  def next_station
+    @route[current_station_id + 1] if current_route != last_route
+  end
+
+  def prev_station
+    @route[current_station_id - 1] if current_route != first_route
+  end
+
+  protected
+
+  def first_route
+    @route&.first
+  end
+
+  def last_route
+    @route.last
+  end
+
+  def stopped?
+    @speed.zero?
+  end
+
+  def leave
+    self.current_route.leave_train(self)
+  end
+
+  def go_to_station
+    self.current_route.comming_train(self)
+  end
+
 end
