@@ -3,7 +3,7 @@
 #
 class Station
  
-  attr_reader :name
+  attr_reader :name, :trains
  
   def initialize(name)
     @name = name
@@ -14,11 +14,11 @@ class Station
     @trains << train
   end
  
-  def show_trains(train_type)
-    @trains.select { |train| train.type == train_type }
+  def show_trains(type)
+    @trains.select { |train| train.type == type }
   end
  
-  def send_train(train)
+  def leave_train(train)
     @trains.delete(train)
   end
  
